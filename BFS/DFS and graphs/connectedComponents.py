@@ -17,7 +17,7 @@ def dfs(x, y):
     for dx, dy in directions:
         nx, ny = x + dx, y + dy
         if 0 <= nx < len(grid[0]) and 0 <= ny < len(grid):
-            if grid[ny][nx] == 1 and (nx, ny) not in visited:
+            if grid[ny][nx] == 1 and (nx, ny) not in visited: #if is an island and not visited yet
                 dfs(nx, ny)
 
 def count_islands():
