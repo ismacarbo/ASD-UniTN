@@ -1,23 +1,27 @@
 import pygame
 
-TILE_SIZE=5
+class Player:
+    def __init__(self, x, y, maze, tile_size):
+        self.x = x
+        self.y = y
+        self.maze = maze
+        self.tile_size = tile_size
 
-class Player: 
-    def __init__(self,x,y,maze):
-        self.x=x
-        self.y=y
-        self.maze=maze #to know where the walls are
-
-    def move(self,dx,dy):
-        newX=self.x+dx
-        newY=self.y+dy
-
-        if self.maze[newX][newY]!="#":
-            newX=self.x
-            newY=self.y
+    def move(self, dx, dy):
+        newX = self.x + dx
+        newY = self.y + dy
+        if self.maze[newY][newX] != "#":
+            self.x = newX
+            self.y = newY
 
     def draw(self, screen):
         pygame.draw.rect(
-            screen, (0, 100, 255),
-            pygame.Rect(self.x * TILE_SIZE, self.y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+            screen,
+            (0, 100, 255),
+            pygame.Rect(
+                self.x * self.tile_size,
+                self.y * self.tile_size,
+                self.tile_size,
+                self.tile_size
+            )
         )

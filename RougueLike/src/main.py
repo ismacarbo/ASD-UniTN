@@ -1,7 +1,9 @@
 import pygame
 from map import generate_dungeon
+from player import Player
+from enemy import Enemy
 
-TILE_SIZE = 16  # Ogni cella è 16x16 pixel
+TILE_SIZE = 16 
 FPS = 60
 
 def draw_maze(screen, maze):
@@ -12,7 +14,13 @@ def draw_maze(screen, maze):
             pygame.draw.rect(screen, color, rect)
 
 def main():
-    maze = generate_dungeon()
+    maze, rooms = generate_dungeon()
+    #spawning player in the center of the map
+    spawn_room = rooms[0]
+    x, y = spawn_room.cx, spawn_room.cy
+    player = Player(x, y, maze, TILE_SIZE)
+    enemy = Enemy(rooms[-1].cx, rooms[-1].cy, maze,TILE_SIZE) #enemy spawn far from player
+
     WIDTH = len(maze[0])
     HEIGHT = len(maze)
 
@@ -26,9 +34,21 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key in (pygame.K_UP, pygame.K_w):
+                    player.move(0, -1)
+                elif event.key in (pygame.K_DOWN, pygame.K_s):
+                    player.move(0, 1)
+                elif event.key in (pygame.K_LEFT, pygame.K_a):
+                    player.move(-1, 0)
+                elif event.key in (pygame.K_RIGHT, pygame.K_d):
+                    player.move(1, 0)
 
         screen.fill((30, 30, 30))
         draw_maze(screen, maze)
+        player.draw(screen)
+        enemy.update((player.x, player.y))
+        enemy.draw(screen)
         pygame.display.flip()
         clock.tick(FPS)
 

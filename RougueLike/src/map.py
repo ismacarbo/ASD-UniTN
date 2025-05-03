@@ -1,4 +1,5 @@
 import random
+import player
 
 #mod: inserted by user
 WIDTH=60
@@ -109,8 +110,10 @@ def generate_dungeon():
         dig_room(maze,room)
     
     connectRooms(maze,rooms)
-    return maze
+    return maze,rooms
+
 
 if __name__=="__main__":
-    maze2=generate_dungeon()
-    printMaze(maze2)
+    maze=generate_dungeon()
+    printMaze(maze)
+    
