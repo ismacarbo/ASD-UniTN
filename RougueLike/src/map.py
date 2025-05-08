@@ -1,5 +1,6 @@
 import random
 import player
+import heapq
 
 #mod: inserted by user
 WIDTH=60
@@ -14,8 +15,8 @@ class Room:
         self.y=y
         self.w=w
         self.h=h
-        self.cx=x+h
-        self.cy=y+h #centroids
+        self.cx=x+w//2
+        self.cy=y+h //2 #centroids
 
     def intersects(self, other):
      return (self.x < other.x + other.w and
@@ -24,20 +25,23 @@ class Room:
             self.y + self.h > other.y)
 
 class UnionFind:
-    def __init__(self,n):
-       self.parent=list(range(n))
+    def __init__(self, n):
+        self.parent = list(range(n))
 
-    def find(self,x):
-        while x!=self.parent[x]:
-            self.parent[x]=self.parent[self.parent[x]]
-            x=self.parent[x]
+    def find(self, x):
+        while x != self.parent[x]:
+            self.parent[x] = self.parent[self.parent[x]]
+            x = self.parent[x]
         return x
     
-    def union(self,a,b):
-       ra,rb=self.find(a),self.find(b)
-       if ra==rb:
-          return False
-       return True
+    def union(self, a, b):
+        ra = self.find(a)
+        rb = self.find(b)
+        if ra == rb:
+            return False
+        self.parent[rb] = ra
+        return True
+
     
 def generateMatrix():
    return [["#" for _ in range(WIDTH)] for _ in range(HEIGHT)]
@@ -73,8 +77,10 @@ def dig_corridor(maze, x1, y1, x2, y2):
         dig_horiz(maze, x1, x2, y2)
 
 def dig_horiz(maze, x1, x2, y):
-    for x in range(min(x1, x2), max(x1, x2)+1):
-        maze[y][x] = ' '
+    if 0 <= y < len(maze):
+        for x in range(min(x1, x2), max(x1, x2) + 1):
+            if 0 <= x < len(maze[0]):
+                maze[y][x] = ' '
 
 def dig_vert(maze, y1, y2, x):
     for y in range(min(y1, y2), max(y1, y2)+1):
@@ -97,6 +103,30 @@ def connectRooms(maze,rooms):
         if uf.union(i,j):
             dig_corridor(maze,rooms[i].cx,rooms[i].cy,rooms[j].cx,rooms[j].cy)
 
+def mstGenerator(rooms):
+    n = len(rooms)
+    visited = set()
+    mst = []
+    heap = []
+
+    visited.add(0)  
+    for j in range(1, n):
+        dist = abs(rooms[0].cx - rooms[j].cx) + abs(rooms[0].cy - rooms[j].cy)
+        heapq.heappush(heap, (dist, 0, j))
+
+    while heap and len(visited) < n:
+        dist, u, v = heapq.heappop(heap)
+        if v not in visited:
+            mst.append((u, v))
+            visited.add(v)
+            for k in range(n):
+                if k not in visited:
+                    d = abs(rooms[v].cx - rooms[k].cx) + abs(rooms[v].cy - rooms[k].cy)
+                    heapq.heappush(heap, (d, v, k))
+    
+    return mst
+
+
 
 def printMaze(maze):
     for row in maze:
@@ -110,7 +140,9 @@ def generate_dungeon():
         dig_room(maze,room)
     
     connectRooms(maze,rooms)
-    return maze,rooms
+    mst = mstGenerator(rooms)
+    print("MST rooms:", mst)
+    return maze,rooms,mst
 
 
 if __name__=="__main__":

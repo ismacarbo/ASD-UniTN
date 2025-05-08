@@ -1,7 +1,8 @@
 import pygame
-from map import generate_dungeon
+from map import *
 from player import Player
 from enemy import Enemy
+from enemyMST import enemyMST
 
 TILE_SIZE = 16 
 FPS = 60
@@ -14,12 +15,14 @@ def draw_maze(screen, maze):
             pygame.draw.rect(screen, color, rect)
 
 def main():
-    maze, rooms = generate_dungeon()
+    maze, rooms,mst = generate_dungeon()
     #spawning player in the center of the map
     spawn_room = rooms[0]
     x, y = spawn_room.cx, spawn_room.cy
     player = Player(x, y, maze, TILE_SIZE)
     enemy = Enemy(rooms[-1].cx, rooms[-1].cy, maze,TILE_SIZE) #enemy spawn far from player
+    enemy_mst_greedy = enemyMST(rooms[3].cx, rooms[3].cy, maze, TILE_SIZE, rooms, mst)
+
 
     WIDTH = len(maze[0])
     HEIGHT = len(maze)
@@ -49,6 +52,9 @@ def main():
         player.draw(screen)
         enemy.update((player.x, player.y))
         enemy.draw(screen)
+        enemy_mst_greedy.update((player.x, player.y))
+        enemy_mst_greedy.draw(screen)
+
         pygame.display.flip()
         clock.tick(FPS)
 

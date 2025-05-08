@@ -8,6 +8,8 @@ class Enemy:
         self.maze=maze
         self.path=[]
         self.tile_size=tile_size
+        self.updateCounter=0
+        self.updateRate=20
 
     def heuristic(self, a, b):
         #manhattan distance
@@ -51,17 +53,23 @@ class Enemy:
             curr = cameFrom[curr]
         path.reverse()
         return path
+    
 
     def update(self, player_pos):
-            if (self.x, self.y) == player_pos:
-                return  #player reached
+        self.updateCounter += 1
+        if self.updateCounter < self.updateRate:
+            return  
+        self.updateCounter = 0  
 
-            if not self.path or self.path[-1] != player_pos:
-                self.path = self.findPath((self.x, self.y), player_pos)
+        if (self.x, self.y) == player_pos:
+            return
 
-            if self.path:
-                next_x, next_y = self.path.pop(0)
-                self.x, self.y = next_x, next_y
+        if not self.path or self.path[-1] != player_pos:
+            self.path = self.findPath((self.x, self.y), player_pos)
+
+        if self.path:
+            next_x, next_y = self.path.pop(0)
+            self.x, self.y = next_x, next_y
 
     def draw(self, screen):
             pygame.draw.rect(
