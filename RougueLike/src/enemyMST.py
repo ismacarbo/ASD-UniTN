@@ -106,19 +106,16 @@ class enemyMST:
         return []
     
     def update(self, player_pos):
-        # riduci la frequenza di ricalcolo del path
         self.updateCounter += 1
         if self.updateCounter < self.updateRate:
             return
         self.updateCounter = 0
 
-        # 1) se ho già un percorso, muoviti di un passo e torna
         if self.path:
             next_x, next_y = self.path.pop(0)
             self.x, self.y = next_x, next_y
             return
 
-        # 2) individua in quale stanza sono il giocatore e io
         player_room = self.roomContaining(player_pos[0], player_pos[1])
         my_room     = self.roomContaining(self.x, self.y)
 
